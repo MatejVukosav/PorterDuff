@@ -1,5 +1,6 @@
 package com.playground.android.vuki.porterduff;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,8 +35,15 @@ public class PorterDuffView extends View {
     private float width;
     private float height;
 
-    private Bitmap star;
+    private Bitmap dest;
+
     private Bitmap mic;
+    private Bitmap star;
+
+    Canvas container;
+    Matrix matrix = new Matrix();
+    PorterDuffXfermode xfermode = new PorterDuffXfermode( PorterDuff.Mode.SRC_IN );
+    PorterDuffXfermode init = new PorterDuffXfermode( PorterDuff.Mode.ADD );
 
     @Override
     protected void onDraw( Canvas canvas ) {
@@ -44,28 +52,38 @@ public class PorterDuffView extends View {
             init();
         }
 
+        dest = Bitmap.createBitmap( star );
+
+        container.setBitmap( dest );
         //canvas background
-//        canvas.drawColor( getResources().getColor( android.R.color.holo_blue_light ) );
-//        paint.setColor( getResources().getColor( android.R.color.holo_purple ) );
+        // canvas.drawColor( getResources().getColor( android.R.color.holo_blue_light ) );
 
-        Canvas can = new Canvas( star );
-//        can.drawColor( getResources().getColor( android.R.color.holo_green_light ) );
-        paint.setXfermode( new PorterDuffXfermode( PorterDuff.Mode.SRC_IN ) );
-        can.drawBitmap( mic, 0, 0, paint );
-//        canvas.drawBitmap( mic, width / 3, 0, paint );
+        paint.setXfermode( xfermode );
+        container.drawBitmap( mic, left, 0, paint );
 
+//        paint.setColor( getResources().getColor( android.R.color.holo_orange_light ) );
         paint.setXfermode( null );
-        paint.setColor( getResources().getColor( android.R.color.holo_orange_light ) );
-        canvas.drawBitmap( star, width / 3, 0, paint );
+        canvas.drawBitmap( dest, 0, 0, paint );
+
     }
 
+    float left = 0;
+    ValueAnimator.AnimatorUpdateListener valueAnimatorListener = new ValueAnimator.AnimatorUpdateListener() {
+        @Override
+        public void onAnimationUpdate( ValueAnimator animation ) {
+            left = (float) animation.getAnimatedValue();
+//            Log.d( "dd", "" + left );
+            postInvalidate();
+        }
+    };
+
     private void init() {
+
         initialized = true;
         paint = new Paint();
         width = getWidth();
         height = getHeight();
 
-        Matrix matrix = new Matrix();
         matrix.setScale( 6, 6 );
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -78,8 +96,15 @@ public class PorterDuffView extends View {
         mic = BitmapFactory.decodeResource( getResources(), android.R.drawable.ic_btn_speak_now, options );
         mic = Bitmap.createBitmap( mic, 0, 0, mic.getWidth(), mic.getHeight(), matrix, false );
 
-//        star = star.extractAlpha();
-//        mic = mic.extractAlpha();
+        container = new Canvas();
+        container.setBitmap( star );
+
+        ValueAnimator valueAnimator = ValueAnimator.ofFloat( 0, container.getWidth(), 0 );
+        valueAnimator.setDuration( 4000 );
+        valueAnimator.setRepeatCount( ValueAnimator.INFINITE );
+        valueAnimator.setRepeatMode( ValueAnimator.REVERSE );
+        valueAnimator.addUpdateListener( valueAnimatorListener );
+        valueAnimator.start();
     }
 
 }
