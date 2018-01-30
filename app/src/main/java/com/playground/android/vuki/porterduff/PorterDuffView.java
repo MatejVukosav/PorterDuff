@@ -45,14 +45,17 @@ public class PorterDuffView extends View {
         }
 
         //canvas background
-       // canvas.drawColor( getResources().getColor( android.R.color.holo_blue_light ) );
+//        canvas.drawColor( getResources().getColor( android.R.color.holo_blue_light ) );
+//        paint.setColor( getResources().getColor( android.R.color.holo_purple ) );
 
+        Canvas can = new Canvas( star );
+//        can.drawColor( getResources().getColor( android.R.color.holo_green_light ) );
+        paint.setXfermode( new PorterDuffXfermode( PorterDuff.Mode.SRC_IN ) );
+        can.drawBitmap( mic, 0, 0, paint );
+//        canvas.drawBitmap( mic, width / 3, 0, paint );
 
-        paint.setColor( getResources().getColor( android.R.color.holo_orange_light ) );
         paint.setXfermode( null );
-
-        canvas.drawBitmap( mic, width / 3, 0, paint );
-        paint.setXfermode( new PorterDuffXfermode( PorterDuff.Mode.DST_IN ) );
+        paint.setColor( getResources().getColor( android.R.color.holo_orange_light ) );
         canvas.drawBitmap( star, width / 3, 0, paint );
     }
 
@@ -63,7 +66,7 @@ public class PorterDuffView extends View {
         height = getHeight();
 
         Matrix matrix = new Matrix();
-        matrix.setScale( 5, 5 );
+        matrix.setScale( 6, 6 );
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -71,8 +74,12 @@ public class PorterDuffView extends View {
         star = BitmapFactory.decodeResource( getResources(), android.R.drawable.btn_star_big_on, options );
         star = Bitmap.createBitmap( star, 0, 0, star.getWidth(), star.getHeight(), matrix, false );
 
+        matrix.setScale( 6, 6 );
         mic = BitmapFactory.decodeResource( getResources(), android.R.drawable.ic_btn_speak_now, options );
         mic = Bitmap.createBitmap( mic, 0, 0, mic.getWidth(), mic.getHeight(), matrix, false );
+
+//        star = star.extractAlpha();
+//        mic = mic.extractAlpha();
     }
 
 }
